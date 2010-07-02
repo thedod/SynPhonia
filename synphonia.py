@@ -139,7 +139,7 @@ def run_or_delete(args,delete_if_failed=None,cwd=None):
         return None
 
 def _get_sample_names():
-    res=[f.split('.')[0] for f in os.listdir(WAV_SAMPLE_PATH)]
+    res=[f.split('.')[0] for f in os.listdir(WAV_SAMPLE_PATH) if f.endswith('.wav')]
     res.sort()
     return res
 
