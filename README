@@ -1,0 +1,39 @@
+SynPhonia v0.2
+
+Note: samples are no longer part of the repository. See below how to get them
+
+What you need
+ * Python >= 2.6
+ * EyeD3 python library: http://eyed3.nicfit.net/
+ * Sox and lame
+ * Ability to run cgi (note: there's a .htaccess file here)
+
+How to install
+ 1) Create synconf.py (See comment about it at synphonia.py).
+
+ 2) Get and unpack the samples:
+    $ wget http://zzzen.com/synphonia.vadim.tar.bz2
+    $ tar xjvf synphonia.vadim.tar.bz2
+
+ 3) Generate sample mp3s by doing
+    $ for f in wav-samples/*.wav ; do lame $f samples/$(basename $f wav)mp3 ; done
+
+ 4) From python, do:
+    >>> import synphonia
+    >>> synphonia.init_samples()
+    This will ID3 tag the mp3 files and create xspf files for them
+
+How to use your own samples:
+ * Name them as a single letter, repeated to indicate length in bars
+   (e.g. 1 bar: x.wav, 4 bars: zzzz.wav), put the at ./wav-samples,
+ * You may also change definitions at synphonia.py (e.g. ARTIST and ALBUM
+   used for ID3 tagging, cache sizes, etc.)
+ * Repeat steps 3 and 4 above
+
+
+Credits:
+* musicplayer.swf is from http://sourceforge.net/projects/musicplayer
+* Sounds are from DJ Vadim's WatchThatSound at http://ccmixter.org/bbe
+  and are distributed under the by-nv creative commons license
+  http://creativecommons.org/licenses/by-nc/3.0/us/
+  Big up for that

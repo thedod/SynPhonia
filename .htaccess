@@ -1,0 +1,6 @@
+Options +ExecCGI
+AddHandler cgi-script .py
+<Files .*>
+order allow,deny
+deny from all
+</Files>

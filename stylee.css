@@ -1,0 +1,4 @@
+body {background-color: #000000; color: #ffffff}
+a {text-decoration:none; color:#ff4000}
+a:hover {text-decoration:underline}
+input {font-family: monospace}
