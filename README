@@ -24,15 +24,21 @@ How to install
     This will ID3 tag the mp3 files and create xspf files for them
 
 How to use your own samples:
- * Name them as a single letter, repeated to indicate length in bars
-   (e.g. 1 bar: x.wav, 4 bars: zzzz.wav), put the at ./wav-samples,
+ * delete old-sample related stuff
+   $ rm mixes/*.mp3 mixes/*.xspf wav-mixes/*.wav samples/*.wav samples/*.xspf wav-samples/*.wav
+
+ * Put you samples at wav-samples. Name them as a single letter, repeated to
+   indicate length in bars (e.g. 1 bar: x.wav, 4 bars: zzzz.wav)
+
+ * Make sure you have a 1-bar-long sample of silence called_.wav
+
  * You may also change definitions at synphonia.py (e.g. ARTIST and ALBUM
    used for ID3 tagging, cache sizes, etc.)
+
  * Repeat steps 3 and 4 above
 
-
 Credits:
-* musicplayer.swf is from http://sourceforge.net/projects/musicplayer
+* For source and license of musicplayer.swf, see LICENSE-MUSICPLAYER
 * Sounds are from DJ Vadim's WatchThatSound at http://ccmixter.org/bbe
   and are distributed under the by-nv creative commons license
   http://creativecommons.org/licenses/by-nc/3.0/us/

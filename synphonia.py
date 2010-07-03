@@ -1,6 +1,21 @@
 #!/usr/local/bin/python2.6
-### for debugging
-import cgitb; cgitb.enable()
+""" For more info: http://wiki.github.com/thedod/SynPhonia/ """
+#   SynPhonia - a cellular-friendly web-based music sequencer toy
+#   Copyright (C) 2010 Nimrod S. Kerrett (@TheRealDod)
+#
+#   This program is free software: you can redistribute it and/or modify
+#   it under the terms of the GNU General Public License as published by
+#   the Free Software Foundation, either version 3 of the License, or
+#   (at your option) any later version.
+#
+#   This program is distributed in the hope that it will be useful,
+#   but WITHOUT ANY WARRANTY; without even the implied warranty of
+#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#   GNU General Public License for more details.
+#
+#   You should have received a copy of the GNU General Public License
+#   along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 
 #################################begin config#################################
 
@@ -19,7 +34,7 @@ MAX_BARS=16 # against DoS
 ARTIST='DJ Vadim (remixed by SynPhonia user)'
 ALBUM='Watch This Sound mixes'
 EMPTY_MIX_HTML="""Empty or invalid mix. Try an <a href="?c0=_yjjrrsszz&c1=__hhgglk&c2=addcbbacdd">example</a>"""
-
+DEBUG_TO_WEB=True # Should be False ;)
 import logging
 #--- uncomment one of the options ---
 #LOG_LEVEL=logging.ERROR
@@ -247,4 +262,6 @@ def init_samples():
         make_xspf(s,SAMPLE_PATH,SAMPLE_URL)
 
 if __name__=='__main__':
+    if DEBUG_TO_WEB:
+        import cgitb; cgitb.enable()
     do_cgi()
