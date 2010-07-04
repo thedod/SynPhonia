@@ -80,7 +80,7 @@ PAGE_TEMPLATE="""<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http:
 """
 FORM_TEMPLATE="""<form method="GET" action="{action}"> 
    <input name="c0" value="{0}"><small> [<b><a target="_blank" href="index.html">Help</a></b></small>]<br/>
-   <input name="c1" value="{1}"><small> <input type="checkbox" name="autoplay"{autoplay_checked}/>AutoPlay</small><br/> 
+   <input name="c1" value="{1}"><small> <input type="checkbox" name="autoplay"{autoplay_checked}/>Auto</small><br/> 
    <input name="c2" value="{2}">
    <input type="submit" value="Remix">
   </form> 
