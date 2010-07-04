@@ -34,6 +34,8 @@ MAX_BARS=16 # against DoS
 ARTIST='DJ Vadim (remixed by SynPhonia user)'
 ALBUM='Watch This Sound mixes'
 EMPTY_MIX_HTML="""Empty or invalid mix. Try an <a href="?c0=_yjjrrsszz&c1=__hhgglk&c2=addcbbacdd">example</a>"""
+CREDITS="""Samples are (<a target="_blank" href="http://creativecommons.org/licenses/by-nc/3.0/us/">cc</a>)
+<a target="_blank" href="http://ccmixter.org/bbe">DJ Vadim</a>."""
 DEBUG_TO_WEB=True # Should be False ;)
 import logging
 #--- uncomment one of the options ---
@@ -58,10 +60,10 @@ PAGE_TEMPLATE="""<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http:
   <title>SynPhonia</title> 
   <link rel="stylesheet" href="stylee.css" type="text/css" />
   <script language="javascript"> 
-   playerbutton=function(path,track) {{
+   playerbutton=function(path,track,flash_args) {{
     document.write(
      '<object type="application/x-shockwave-flash" data="{flash_player_url}?playlist_url='+
-     path+'/'+track+'.xspf&b_bgcolor=&b_fgcolor=cf3f3f" width="17" height="17"><param name="wmode" value="transparent"></object>' 
+     path+'/'+track+'.xspf&autoload=true&b_bgcolor=&b_fgcolor=cf3f3f'+flash_args+'" width="17" height="17"><param name="wmode" value="transparent"></object>' 
     );
    }}
   </script> 
@@ -72,21 +74,19 @@ PAGE_TEMPLATE="""<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http:
   {mix}
   <hr/>
   Samples: {samples}<br/>
-  <small>1 letter = 1 bar, _ = silence, Case insensitive<br/>
-  Samples are (<a target="_blank" href="http://creativecommons.org/licenses/by-nc/3.0/us/">cc</a>)
-  <a target="_blank" href="http://ccmixter.org/bbe">DJ Vadim</a></small>
+  <small>{credits}</small>
  </body>
 </html>
 """
 FORM_TEMPLATE="""<form method="GET" action="{action}"> 
-   <input name="c0" value="{0}"><br/> 
-   <input name="c1" value="{1}"><br/> 
+   <input name="c0" value="{0}"><small> [<b><a target="_blank" href="index.html">Help</a></b></small>]<br/>
+   <input name="c1" value="{1}"><small> <input type="checkbox" name="autoplay"{autoplay_checked}/>AutoPlay</small><br/> 
    <input name="c2" value="{2}">
    <input type="submit" value="Remix">
   </form> 
 """
 
-TRACK_TEMPLATE="""<script language="javascript">playerbutton('{path}','{track}')</script>""" + \
+TRACK_TEMPLATE="""<script language="javascript">playerbutton('{path}','{track}','{flash_args}')</script>""" + \
 """<a href="{path}/{track}.mp3">{track}</a>
 """
 
@@ -240,13 +240,16 @@ def do_cgi():
     os.environ['TERM']='vt100' # to fool old version of lame that needs this
     fields = cgi.FieldStorage()
     channels=[fields.getvalue('c{0}'.format(i),'') for i in range(3)]
+    autoplay=fields.getvalue('autoplay','')
     track,parsed_values,errors=make_mix(channels)
-    form_html=FORM_TEMPLATE.format(*parsed_values,action=script_name)
+    form_html=FORM_TEMPLATE.format(*parsed_values,action=script_name,
+        autoplay_checked=autoplay and ' checked="checked"' or '')
     errors_html=errors and """<div class="errors">{0}</div>""".format('<br/>\n'.join(errors)) or ""
     mix_html=track and  """<div class="mix">mix: {0}</div>""".format(
-                           TRACK_TEMPLATE.format(path=MIX_URL,track=track)) or ""
-    samples_html=''.join([TRACK_TEMPLATE.format(path=SAMPLE_URL,track=s) for s in SAMPLE_NAMES])
-    page_html=PAGE_TEMPLATE.format(flash_player_url=FLASH_PLAYER_URL,form=form_html,
+                           TRACK_TEMPLATE.format(path=MIX_URL,track=track,
+                                                 flash_args=autoplay and "&autoplay=true" or "")) or ""
+    samples_html=''.join([TRACK_TEMPLATE.format(path=SAMPLE_URL,track=s,flash_args="") for s in SAMPLE_NAMES])
+    page_html=PAGE_TEMPLATE.format(flash_player_url=FLASH_PLAYER_URL,form=form_html,credits=CREDITS,
                                    errors=errors_html,mix=mix_html,samples=samples_html)
     print """Content-type:text/html; charset=utf-8
 
