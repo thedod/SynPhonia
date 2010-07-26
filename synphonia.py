@@ -103,7 +103,7 @@ FORM_TEMPLATE="""<form method="GET" action="{action}">
 """
 
 TRACK_TEMPLATE="""<script language="javascript">playerbutton('{path}','{track}','{flash_args}')</script>""" + \
-"""<a href="{path}/{track}.mp3">{track}</a>
+"""<a href="{path}/{track}.mp3">{title}</a>
 """
 
 XSPF_TEMPLATE="""<?xml version="1.0" encoding="utf-8"?>
@@ -276,9 +276,9 @@ def do_cgi():
         autoplay_checked=autoplay and ' checked="checked"' or '')
     errors_html=errors and """<div class="errors">{0}</div>""".format('<br/>\n'.join(errors)) or ""
     mix_html=track and  """<div class="mix">mix: {0}</div>""".format(
-                           TRACK_TEMPLATE.format(path=MIX_URL,track=track,
+                           TRACK_TEMPLATE.format(path=MIX_URL,track=track,title='MP3',
                                                  flash_args=autoplay and "&autoplay=true" or "")) or ""
-    samples_html=''.join([TRACK_TEMPLATE.format(path=SAMPLE_URL,track=s,flash_args="") for s in SAMPLE_NAMES])
+    samples_html=''.join([TRACK_TEMPLATE.format(path=SAMPLE_URL,track=s,title=s,flash_args="") for s in SAMPLE_NAMES])
     page_html=PAGE_TEMPLATE.format(flash_player_url=FLASH_PLAYER_URL,form=form_html,credits=CREDITS,
                                    errors=errors_html,mix=mix_html,samples=samples_html)
     print """Content-type:text/html; charset=utf-8
