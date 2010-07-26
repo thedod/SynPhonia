@@ -33,7 +33,7 @@ MP3_CACHE_TRACKS=100
 MAX_BARS=16 # against DoS
 ARTIST='DJ Vadim (remixed by SynPhonia user)'
 ALBUM='Watch This Sound mixes'
-EMPTY_MIX_HTML="""Empty or invalid mix. Try an <a href="?c0=_yjjrrsszz&c1=__hhgglk&c2=addcbbacdd">example</a>"""
+EMPTY_MIX_HTML="""Empty or invalid mix. Try an <a href="?c0=_yjjrrsszz&c1=__llllkk_y&c2=__gggghh__&c3=addcbbacdd">example</a>"""
 CREDITS="""Samples are (<a target="_blank" href="http://creativecommons.org/licenses/by-nc/3.0/us/">cc</a>)
 <a target="_blank" href="http://ccmixter.org/bbe">DJ Vadim</a>."""
 DEBUG_TO_WEB=True # Should be False ;)
@@ -79,10 +79,13 @@ PAGE_TEMPLATE="""<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http:
 </html>
 """
 FORM_TEMPLATE="""<form method="GET" action="{action}"> 
-   <input name="c0" value="{0}"><small> [<b><a target="_blank" href="index.html">Help</a></b></small>]<br/>
-   <input name="c1" value="{1}"><small> <input type="checkbox" name="autoplay"{autoplay_checked}/>Auto</small><br/> 
-   <input name="c2" value="{2}">
-   <input type="submit" value="Remix">
+   <input name="c0" value="{0}"><br/>
+   <input name="c1" value="{1}"><br/> 
+   <input name="c2" value="{2}"><br/>
+   <input name="c3" value="{3}"><br/>
+   <input type="submit" value="Remix"/>
+   <small><input type="checkbox" name="autoplay"{autoplay_checked}/>AutoPlay</small>
+   [<b><a target="_blank" href="index.html">Help</a></b></small>]</small>
   </form> 
 """
 
@@ -239,7 +242,7 @@ def do_cgi():
         raise Exception,"Program should run as a cgi"
     os.environ['TERM']='vt100' # to fool old version of lame that needs this
     fields = cgi.FieldStorage()
-    channels=[fields.getvalue('c{0}'.format(i),'') for i in range(3)]
+    channels=[fields.getvalue('c{0}'.format(i),'') for i in range(4)]
     autoplay=fields.getvalue('autoplay','')
     track,parsed_values,errors=make_mix(channels)
     form_html=FORM_TEMPLATE.format(*parsed_values,action=script_name,
