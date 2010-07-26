@@ -33,7 +33,7 @@ MP3_CACHE_TRACKS=100
 MAX_BARS=16 # against DoS
 ARTIST='DJ Vadim (remixed by SynPhonia user)'
 ALBUM='Watch This Sound mixes'
-EMPTY_MIX_HTML="""Empty or invalid mix. Try an <a href="?c0=_yjjrrsszz&c1=__llllkk_y&c2=__gggghh__&c3=addcbbacdd">example</a>"""
+EMPTY_MIX_HTML="""Empty or invalid mix. Try an <a href="?c0=_yjjrrsszz&c1=__llllkk_y&c2=__gggghh__&c3=addcbbacdd&s=-1">example</a>"""
 CREDITS="""Samples are (<a target="_blank" href="http://creativecommons.org/licenses/by-nc/3.0/us/">cc</a>)
 <a target="_blank" href="http://ccmixter.org/bbe">DJ Vadim</a>."""
 DEBUG_TO_WEB=True # Should be False ;)
@@ -74,19 +74,32 @@ PAGE_TEMPLATE="""<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http:
   {mix}
   <hr/>
   Samples: {samples}<br/>
-  <small>{credits}</small>
+  {credits}
+  [<b><a target="_blank" href="index.html">Help</a></b>]
  </body>
 </html>
 """
+# The s="-1" kludge: we don't want s="" because some browsers
+# don't select the radio button in that case, so any non-numeric s
+# is considered "no solo", and we use -1 because it sorta makes sense :)
+# "" would still work (e.g. if you skip s= in url) since it's non-numeric.
 FORM_TEMPLATE="""<form method="GET" action="{action}"> 
-   <input name="c0" value="{0}"><br/>
-   <input name="c1" value="{1}"><br/> 
-   <input name="c2" value="{2}"><br/>
-   <input name="c3" value="{3}"><br/>
-   <input type="submit" value="Remix"/>
-   <small><input type="checkbox" name="autoplay"{autoplay_checked}/>AutoPlay</small>
-   [<b><a target="_blank" href="index.html">Help</a></b></small>]</small>
-  </form> 
+       <input name="c0" value="{0}">
+       <input type="radio" name="s" value="0"{solo0}/>Solo
+       <br/>
+       <input name="c1" value="{1}">
+       <input type="radio" name="s" value="1"{solo1}/>
+       <br/>
+       <input name="c2" value="{2}">
+       <input type="radio" name="s" value="2"{solo2}/>
+       <br/>
+       <input name="c3" value="{3}">
+       <input type="radio" name="s" value="3"{solo3}/>
+       <br/>
+       <input type="submit" value="Remix"/>
+       <small><input type="checkbox" name="autoplay"{autoplay_checked}/>Auto Play</small>
+       <input type="radio" name="s" value="-1"{nosolo}/>No solo
+</form> 
 """
 
 TRACK_TEMPLATE="""<script language="javascript">playerbutton('{path}','{track}','{flash_args}')</script>""" + \
@@ -199,19 +212,27 @@ def make_channel(samples):
             return None,["Concatenation error ({0}): {1}".format(basename,err)]
     return filepath,basename
 
-def make_mix(channel_strings):
+def make_mix(channel_strings,solo):
     channel_lists=map(parse_channel,channel_strings)
     parsed_values=[''.join(l) for l in channel_lists]
-    channel_names=filter(None,parsed_values)
-    if not channel_names:
+    # the prefix actual_ means only solo track (or all if no solo)
+    if solo.isdigit():
+        isolo=int(solo)%4 # avoid IndexError if e.g. s=42 in url :)
+        actual_channel_lists=[channel_lists[isolo]]
+        actual_parsed_values=[parsed_values[isolo]]
+    else:
+        actual_channel_lists=channel_lists
+        actual_parsed_values=parsed_values
+    actual_channel_names=filter(None,actual_parsed_values)
+    if not actual_channel_names:
         return None,parsed_values,[EMPTY_MIX_HTML]
-    basename='-'.join(channel_names)
+    basename='-'.join(actual_channel_names)
     filepath='{0}/{1}.mp3'.format(MIX_PATH,basename)
     errors=[]
     if not touch_if_exists(filepath): # Not in cache? generate.
         wavname=basename+'.wav'
         wavpath='{0}/{1}'.format(WAV_MIX_PATH,wavname)
-        channel_pairs=map(make_channel,filter(None,channel_lists))
+        channel_pairs=map(make_channel,filter(None,actual_channel_lists))
         errors=[p[1] for p in channel_pairs if not p[0]]
         channels=[p[0] for p in channel_pairs if p[0]]
         if not channels:
@@ -244,8 +265,14 @@ def do_cgi():
     fields = cgi.FieldStorage()
     channels=[fields.getvalue('c{0}'.format(i),'') for i in range(4)]
     autoplay=fields.getvalue('autoplay','')
-    track,parsed_values,errors=make_mix(channels)
+    solo=fields.getvalue('s','')
+    track,parsed_values,errors=make_mix(channels,solo)
     form_html=FORM_TEMPLATE.format(*parsed_values,action=script_name,
+        solo0 = solo=='0' and ' checked="checked"' or '',
+        solo1 = solo=='1' and ' checked="checked"' or '',
+        solo2 = solo=='2' and ' checked="checked"' or '',
+        solo3 = solo=='3' and ' checked="checked"' or '',
+        nosolo = not solo.isdigit() and ' checked="checked"' or '', # see s="-1" kludge above
         autoplay_checked=autoplay and ' checked="checked"' or '')
     errors_html=errors and """<div class="errors">{0}</div>""".format('<br/>\n'.join(errors)) or ""
     mix_html=track and  """<div class="mix">mix: {0}</div>""".format(
@@ -261,8 +288,9 @@ def do_cgi():
 def init_samples():
     """When you add new samples to WAV_SAMPLE_PATH, you should:
        1) Add their respective mp3 files to SAMPLE_PATH
-       2) Run init_samples() to id3-tag thwem andcreate their
-          xspf files for the flash player"""
+       2) Run init_samples() to id3-tag them and create their
+          xspf files for the flash player
+See README file for details"""
     for s in SAMPLE_NAMES:
         write_id3('{0}/{1}.mp3'.format(SAMPLE_PATH,s),s)
         make_xspf(s,SAMPLE_PATH,SAMPLE_URL)
