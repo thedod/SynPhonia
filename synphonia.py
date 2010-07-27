@@ -71,7 +71,7 @@ PAGE_TEMPLATE="""<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http:
  <body> 
   {form}
   {errors}
-  {mix} [<a target="_blank" href="ugcurl/">Share/submit</a>]
+  {mix}{sharelink}
   <hr/>
   Samples: {samples}<br/>
   {credits}
@@ -278,9 +278,10 @@ def do_cgi():
     mix_html=track and  """<span class="mix">mix: {0}</span>""".format(
                            TRACK_TEMPLATE.format(path=MIX_URL,track=track,title='MP3',
                                                  flash_args=autoplay and "&autoplay=true" or "")) or ""
+    sharelink=track and """ [<a target="_blank" href="ugcurl/">Share/Submit</a>]""" or ""
     samples_html=''.join([TRACK_TEMPLATE.format(path=SAMPLE_URL,track=s,title=s,flash_args="") for s in SAMPLE_NAMES])
     page_html=PAGE_TEMPLATE.format(flash_player_url=FLASH_PLAYER_URL,form=form_html,credits=CREDITS,
-                                   errors=errors_html,mix=mix_html,samples=samples_html)
+                                   errors=errors_html,mix=mix_html,samples=samples_html,sharelink=sharelink)
     print """Content-type:text/html; charset=utf-8
 
 {0}""".format(page_html)
