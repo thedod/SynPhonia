@@ -17,42 +17,9 @@
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#################################begin config#################################
-
-#synconf.py should look like:
-#BASE_PATH='/path/to/this-folder'
-#BASE_URL='http://example.org/path/to/this-folder'
-##Uncomment one of the following:
-#SOX_MIX_COMMAND=['sox','-m'] # For most modern machines
-##SOX_MIX_COMMAND=['soxmix'] # for old machines
-
-from synconf import BASE_PATH,BASE_URL,SOX_MIX_COMMAND
-
-WAV_CACHE_TRACKS=30
-MP3_CACHE_TRACKS=100
-MAX_BARS=16 # against DoS
-ARTIST='DJ Vadim (remixed by SynPhonia user)'
-ALBUM='Watch This Sound mixes'
-EMPTY_MIX_HTML="""Empty or invalid mix. Try an <a href="?c0=_yjjrrsszz&c1=__llllkk_y&c2=__gggghh__&c3=addcbbacdd&s=-1">example</a>"""
-CREDITS="""Samples are (<a target="_blank" href="http://creativecommons.org/licenses/by-nc/3.0/us/">cc</a>)
-<a target="_blank" href="http://ccmixter.org/bbe">DJ Vadim</a>."""
-DEBUG_TO_WEB=True # Should be False ;)
-import logging
-#--- uncomment one of the options ---
-#LOG_LEVEL=logging.ERROR
-#LOG_LEVEL=logging.WARNING
-#LOG_LEVEL=logging.INFO
-LOG_LEVEL=logging.DEBUG
-
-#############################begin low level config############################
-LOG_FILE=BASE_PATH+'/.synphonia.log' # we don't want this available via web
-WAV_SAMPLE_PATH=BASE_PATH+'/wav-samples'
-WAV_MIX_PATH=BASE_PATH+'/wav-mixes'
-SAMPLE_PATH=BASE_PATH+'/samples'
-SAMPLE_URL=BASE_URL+'/samples'
-MIX_PATH=BASE_PATH+'/mixes'
-MIX_URL=BASE_URL+'/mixes'
-FLASH_PLAYER_URL=BASE_URL+'/musicplayer.swf'
+# You should copy synconf_example.py to synconf.py
+# And then edit it according to the comments there
+from synconf import *
 
 PAGE_TEMPLATE="""<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"> 
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en"> 
@@ -261,6 +228,17 @@ def do_cgi():
         script_name=os.environ['SCRIPT_NAME']
     except: 
         raise Exception,"Program should run as a cgi"
+    if DEBUG_TO_WEB:
+        import cgitb; cgitb.enable()
+
+    # If ugcurl was configured, we'll show share/submit link
+    # See README
+    use_sharelink=False
+    try:
+        from ugcurl import whatconf
+        use_sharelink=True
+    except:
+        pass
     os.environ['TERM']='vt100' # to fool old version of lame that needs this
     fields = cgi.FieldStorage()
     channels=[fields.getvalue('c{0}'.format(i),'') for i in range(4)]
@@ -278,7 +256,7 @@ def do_cgi():
     mix_html=track and  """<span class="mix">mix: {0}</span>""".format(
                            TRACK_TEMPLATE.format(path=MIX_URL,track=track,title='MP3',
                                                  flash_args=autoplay and "&autoplay=true" or "")) or ""
-    sharelink=track and """ [<a target="_blank" href="ugcurl/">Share/Submit</a>]""" or ""
+    sharelink=use_sharelink and track and """ [<a target="_blank" href="ugcurl/">Share/Submit</a>]""" or ""
     samples_html=''.join([TRACK_TEMPLATE.format(path=SAMPLE_URL,track=s,title=s,flash_args="") for s in SAMPLE_NAMES])
     page_html=PAGE_TEMPLATE.format(flash_player_url=FLASH_PLAYER_URL,form=form_html,credits=CREDITS,
                                    errors=errors_html,mix=mix_html,samples=samples_html,sharelink=sharelink)
@@ -297,6 +275,4 @@ See README file for details"""
         make_xspf(s,SAMPLE_PATH,SAMPLE_URL)
 
 if __name__=='__main__':
-    if DEBUG_TO_WEB:
-        import cgitb; cgitb.enable()
     do_cgi()

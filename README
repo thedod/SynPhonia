@@ -1,6 +1,4 @@
-SynPhonia v0.2
-
-Note: samples are no longer part of the repository. See below how to get them
+SynPhonia v0.3
 
 What you need
  * Python >= 2.6
@@ -9,7 +7,9 @@ What you need
  * Ability to run cgi (note: there's a .htaccess file here)
 
 How to install
- 1) Create synconf.py (See comment about it at synphonia.py).
+ 1) Copy synconf_example.py to sysconf.py and edit it (see comments inside)
+    If also want the [Share/Submit] functionality, cd to ugcurl and configure
+    it (see README there).
 
  2) Get and unpack the samples:
     $ wget http://zzzen.com/synphonia.vadim.tar.bz2
