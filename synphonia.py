@@ -71,7 +71,7 @@ PAGE_TEMPLATE="""<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http:
  <body> 
   {form}
   {errors}
-  {mix}
+  {mix} [<a target="_blank" href="ugcurl/">Share/submit</a>]
   <hr/>
   Samples: {samples}<br/>
   {credits}
@@ -275,7 +275,7 @@ def do_cgi():
         nosolo = not solo.isdigit() and ' checked="checked"' or '', # see s="-1" kludge above
         autoplay_checked=autoplay and ' checked="checked"' or '')
     errors_html=errors and """<div class="errors">{0}</div>""".format('<br/>\n'.join(errors)) or ""
-    mix_html=track and  """<div class="mix">mix: {0}</div>""".format(
+    mix_html=track and  """<span class="mix">mix: {0}</span>""".format(
                            TRACK_TEMPLATE.format(path=MIX_URL,track=track,title='MP3',
                                                  flash_args=autoplay and "&autoplay=true" or "")) or ""
     samples_html=''.join([TRACK_TEMPLATE.format(path=SAMPLE_URL,track=s,title=s,flash_args="") for s in SAMPLE_NAMES])
