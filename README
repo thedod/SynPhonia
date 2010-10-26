@@ -7,7 +7,7 @@ What you need
  * Ability to run cgi (note: there's a .htaccess file here)
 
 How to install
- 1) Copy synconf_example.py to sysconf.py and edit it (see comments inside)
+ 1) Copy synconf_example.py to synconf.py and edit it (see comments inside)
     If also want the [Share/Submit] functionality, cd to ugcurl and configure
     it (see README there).
 
